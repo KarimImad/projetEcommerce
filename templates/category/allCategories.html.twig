@@ -3,20 +3,25 @@
 {% block title %}All categories{% endblock %}
 
 {% block body %}
-<a href="{{path('app_category_new')}}" class="btn btn-outline-success">Ajouter une catégorie</a>
+
 <h1 class="text-center"> Tableau de categories</h1>
 
+  {% include 'layouts/flash_message.html.twig'%}
+
 {% for category in categories %}
+<tr>
 <div class="container">
 <div class="card col-3">
   <div class="card-body">
     <h5>{{category.name}}</h5>
+    <td>
       <a href="{{ path ('update', {'id': category.id}) }}" class="btn btn-outline-warning"> Modifier </a>
-      <a href="{{ path ('delete', {'id': category.id}) }}" class="btn btn-outline-danger"> Supprimer </a>
-   
+      <a onclick="return confirm('Voulez vous vraiment supprimer cette catégorie?')" href="{{ path ('delete', {'id': category.id}) }}" class="btn btn-outline-danger"> Supprimer </a>
+   </td>
   </div>
 </div>
 </div>
+</tr>
 {% endfor %}
 
 {% endblock %}

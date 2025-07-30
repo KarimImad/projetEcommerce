@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello UserController!{% endblock %}
+
+{% block body %}
+<h2 class="text-center"> Liste des Utilisateurs</h2>
+
+<div class="container">
+    <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Email</th>
+                    <th>Rôle</th>
+                    <th>Action</th>
+                </tr>
+        {% for user in users %}
+            <tr>
+               
+                <td>{{user.id}}</td>
+                <td>{{user.firstname}}</td>
+                <td>{{user.lastname}}</td>
+                <td>{{user.email}}</td>
+
+                <td>
+                    {% for role in user.roles %}
+
+                        {{role}}
+
+                    {% endfor %}
+                </td>
+
+                <td>
+                    <a href="{{path('app_user_change_role',{'id':user.id})}}" class="btn btn-info">Modifier</a>
+                    <a href="" class="btn btn-danger">Supprimer</a>
+                </td>
+
+                <td>
+                <a onclick="return confirm('Voulez vous vraimentaffecter ce rôle à ce user?')" href="{{path('app_user_change_role', {'id':user.id}) }}></a>
+                </td>   
+            </tr>
+            {% endfor %}
+    </table>
+</div>
+{% endblock %}
