@@ -32,15 +32,18 @@
                 </td>
 
                 <td>
-                    <a href="{{path('app_user_change_role',{'id':user.id})}}" class="btn btn-info">Modifier</a>
-                    <a href="" class="btn btn-danger">Supprimer</a>
+                    {% if ("ROLE_ADMIN" in user.roles) == false %}
+                        {% if ("ROLE_EDITOR" in user.roles) == false %}
+                            <a href="{{ path('app_user_change_role', {'id': user.id}) }}" onclick= "return confirm('Do you really want to change the role of this user ?')" class="btn btn-outline-warning">Modify Role</a>
+                        {% else %} 
+                            <a href="{{ path('app_user_delete_role', {'id': user.id}) }}" class="btn btn-outline-danger" onclick= "return confirm('Do you really want to delete the role for this user?')">Delete Role</a>
+                        {% endif %}
+                        <a href="{{ path('app_user_remove', {'id': user.id}) }}" class="btn btn-danger" onclick= "return confirm('Do you really want to delete this user?')">Delete User</a>
+                    {% endif %}
                 </td>
-
-                <td>
-                <a onclick="return confirm('Voulez vous vraimentaffecter ce rôle à ce user?')" href="{{path('app_user_change_role', {'id':user.id}) }}></a>
-                </td>   
             </tr>
-            {% endfor %}
+        {% endfor %}
+        
     </table>
 </div>
 {% endblock %}
