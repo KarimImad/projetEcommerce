@@ -45,12 +45,13 @@
         {% endif %}
         {% if app.user == false %}
         <li>
-            <a href="{{ path('app_register')}}">Inscription</a>
+            <a class="nav-link active" aria-current="page" href="{{ path('app_register')}}">Inscription</a>
         </li>
         <li>
-            <a href="{{ path('app_login')}}">Se connecter</a>
+            <a class="nav-link active" aria-current="page" href="{{ path('app_login')}}">Se connecter</a>
         </li> 
         {% endif %}
+
     </div>
   </div>
 </nav>
