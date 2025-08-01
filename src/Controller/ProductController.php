@@ -2,16 +2,22 @@
 
 namespace App\Controller;
 
+use DateTimeImmutable;
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Entity\AddProductHistory;
+use App\Form\AddProductHistoryType;
+use PhpParser\Node\Stmt\TryCatch;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
-#[Route('/product')]
+#[Route('/editor/product')]
 final class ProductController extends AbstractController
 {
     #[Route(name: 'app_product_index', methods: ['GET'])]
@@ -22,16 +28,46 @@ final class ProductController extends AbstractController
         ]);
     }
 
+#region ADD
+
     #[Route('/new', name: 'app_product_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, SluggerInterface $slugger): Response
     {
         $product = new Product();
         $form = $this->createForm(ProductType::class, $product);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $image = $form->get('image')->getData(); // on recupère le fichier de l'image qui sera upload//
+
+            if($image){ //si l'image a bien été envoyée 
+                $originalName = pathinfo($image->getCLientOriginalName(), PATHINFO_FILENAME);//on récupère le nom d'origine sans les extensions (jpeg etc)
+                $safeImageName = $slugger->slug($originalName);//on va "slugger" donc remplacer tous les accents,espaces etc par un " - "
+                $newFileImageName = $safeImageName.'-'.uniqid().'.'.$image->guessExtension();//ajoute un id unique et donc l'extension 
+
+                try { //ça va déplacer le fichier, ici l'image, dans le dossier que j'aurai défini dans le paramètre imagedirectory,
+                    $image->move
+                        ($this->getParameter('image_directory'),
+                        $newFileImageName);
+                        
+                } catch (FileException $exception) {
+                    //gestion d'un message erreur si besoin 
+                }     
+                    $product->setImage($newFileImageName); // on sauvegarde le nom du fichier dans son entité
+            }
+
             $entityManager->persist($product);
             $entityManager->flush();
+
+            $stockHistory = new AddProductHistory();
+            $stockHistory->setQuantity($product->getStock());
+            $stockHistory->setProduct($product);
+            $stockHistory->setCreatedAt(new DateTimeImmutable());
+            $entityManager->persist($stockHistory);
+            $entityManager->flush();
+
+            $this->addFlash('succes','Votre produit a été ajouté');
+
 
             return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
@@ -41,6 +77,8 @@ final class ProductController extends AbstractController
             'form' => $form,
         ]);
     }
+
+#endregion
 
     #[Route('/{id}', name: 'app_product_show', methods: ['GET'])]
     public function show(Product $product): Response
@@ -78,4 +116,17 @@ final class ProductController extends AbstractController
 
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
+
+    #[Route('/add/product/{id}/', name: 'app_product_stock_add', methods: ['POST'])]
+    public function stockAdd($id,Request $request, EntityManagerInterface $entityManager): Response
+    {
+      $stockAdd = new AddProductHistory();
+      $form=$this->createForm(AddProductHistoryType::class, $stockAdd);
+      $form->handleRequest($request);
+
+      return 
+
+      
+    }
+
 }
