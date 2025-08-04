@@ -5,15 +5,16 @@ namespace App\Controller;
 use DateTimeImmutable;
 use App\Entity\Product;
 use App\Form\ProductType;
+use App\Form\ProductUpdateType;
 use App\Entity\AddProductHistory;
-use App\Form\AddProductHistoryType;
-use App\Repository\AddProductHistoryRepository;
 use PhpParser\Node\Stmt\TryCatch;
+use App\Form\AddProductHistoryType;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\AddProductHistoryRepository;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -92,15 +93,32 @@ final class ProductController extends AbstractController
     #[Route('/{id}/edit', name: 'app_product_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(ProductType::class, $product);
+        $form = $this->createForm(ProductUpdateType::class, $product);
         $form->handleRequest($request);
+        
+         if ($form->isSubmitted() && $form->isValid()) {
+            $image = $form->get('image')->getData(); // on recupère le fichier de l'image qui sera upload//
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+            if($image){ //si l'image a bien été envoyée 
+                $originalName = pathinfo($image->getCLientOriginalName(), PATHINFO_FILENAME);//on récupère le nom d'origine sans les extensions (jpeg etc)
+                $safeImageName = $slugger->slug($originalName);//on va "slugger" donc remplacer tous les accents,espaces etc par un " - "
+                $newFileImageName = $safeImageName.'-'.uniqid().'.'.$image->guessExtension();//ajoute un id unique et donc l'extension 
+
+                try { //ça va déplacer le fichier, ici l'image, dans le dossier que j'aurai défini dans le paramètre imagedirectory,
+                    $image->move
+                        ($this->getParameter('image_directory'),
+                        $newFileImageName);
+                        
+                } catch (FileException $exception) {
+                    //gestion d'un message erreur si besoin 
+                }     
+                    $product->setImage($newFileImageName); // on sauvegarde le nom du fichier dans son entité
+            }
+             $entityManager->flush();
 
             return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
         }
-
+        
         return $this->render('product/edit.html.twig', [
             'product' => $product,
             'form' => $form,
