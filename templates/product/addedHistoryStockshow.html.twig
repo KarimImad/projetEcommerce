@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Product index{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>Historique de stock</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Quantity</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for productAdded in productsAdded %}
+            <tr>
+                <td>{{ productAdded.id }}</td>
+                <td>{{ productAdded.quantity }}</td>
+                <td>{{ productAdded.createdAt|date ('Y-m-d H:i:s','Europe/Paris')}}</td>
+            </tr>
+
+        {% endfor %}
+
+    {% endblock %}

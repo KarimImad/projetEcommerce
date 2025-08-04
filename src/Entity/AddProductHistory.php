@@ -15,7 +15,7 @@ class AddProductHistory
 
     #[ORM\ManyToOne(inversedBy: 'addProductHistories')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Product $Product = null;
+    private ?Product $product = null;
 
     #[ORM\Column]
     private ?int $Quantity = null;
@@ -30,12 +30,12 @@ class AddProductHistory
 
     public function getProduct(): ?Product
     {
-        return $this->Product;
+        return $this->product;
     }
 
     public function setProduct(?Product $Product): static
     {
-        $this->Product = $Product;
+        $this->product = $Product;
 
         return $this;
     }

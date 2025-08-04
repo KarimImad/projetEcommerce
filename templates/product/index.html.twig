@@ -30,9 +30,9 @@
                 <td>{{'Stock épuisé'}}</td>
                 {% endif %}
                 <td>
-                    <a href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
-                    <a href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
-                    <a class="btn tbn-outline-info" href="">Ajouter du stock</a>
+                    <a class="btn btn-outline-success" href="{{ path('app_product_show', {'id': product.id}) }}">show</a>
+                    <a class="btn btn-outline-warning" href="{{ path('app_product_edit', {'id': product.id}) }}">edit</a>
+                    <a class="btn btn-outline-info" href="{{ path('app_product_stock_add', {'id': product.id}) }}">Ajouter du stock</a>
 
                 </td>
             </tr>

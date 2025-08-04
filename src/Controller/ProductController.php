@@ -7,6 +7,7 @@ use App\Entity\Product;
 use App\Form\ProductType;
 use App\Entity\AddProductHistory;
 use App\Form\AddProductHistoryType;
+use App\Repository\AddProductHistoryRepository;
 use PhpParser\Node\Stmt\TryCatch;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -117,16 +118,51 @@ final class ProductController extends AbstractController
         return $this->redirectToRoute('app_product_index', [], Response::HTTP_SEE_OTHER);
     }
 
-    #[Route('/add/product/{id}/', name: 'app_product_stock_add', methods: ['POST'])]
-    public function stockAdd($id,Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/add/product/{id}/', name: 'app_product_stock_add', methods: ['GET','POST'])]
+    public function stockAdd($id,Request $request, EntityManagerInterface $entityManager,ProductRepository $productRepo): Response
     {
       $stockAdd = new AddProductHistory();
       $form=$this->createForm(AddProductHistoryType::class, $stockAdd);
       $form->handleRequest($request);
+      $product=$productRepo->find($id);
+    
+      if ($form->isSubmitted() && $form->isValid()) {
 
-      return 
+        if($stockAdd->getQuantity()>0){
+            $newQuantity = $product->getStock() + $stockAdd->getQuantity();
+            $product->setStock($newQuantity);
 
+            $stockAdd->setCreatedAt(new DateTimeImmutable());
+            $stockAdd->setProduct($product);
+            $entityManager->persist($stockAdd);
+            $entityManager->flush();
+
+            $this->addFlash('succes',"Le stock du produit a été modifié");
+            return $this->redirectToRoute('app_product_index');
+        }
       
+     }
+
+     return $this->render('product/addStock.html.twig',
+        ['form'=> $form->createView(),
+        'product'=>$product,
+        ]
+
+      );
+
+    }
+
+     #[Route('/add/product/{id}/stock/history', name: 'app_product_stock_add_history', methods: ['GET'])]
+    public function showHistoryProductStocks($id,ProductRepository $productRepository,AddProductHistoryRepository $addProductHistoryRepository): Response
+    {
+        $Product= $productRepository->find($id);
+        $productAddHistory = $addProductHistoryRepository->findBy(['product'=>$Product],['id'=>'DESC']);
+
+        return $this->render('product/addedHistoryStockshow.html.twig', [
+            "productsAdded"=>$productAddHistory
+        ]);
+
     }
 
 }
+
