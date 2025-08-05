@@ -2,10 +2,10 @@
     {{ form_row(form.name,{'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.Description,{'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.Price,{'attr':{'class':'form form-control'}}) }}
-    {% if 'button_label' != 'Update' %}
+    {% if button_label != 'Update' %}
         {{ form_row(form.stock,{'attr':{'class':'form form-control'}}) }}
     {% endif %}
     {{ form_row(form.SubCategory,{'attr':{'class':'form form-control'}}) }}
     {{ form_row(form.image,{'attr':{'class':'form'}}) }}
-    <button class="btn btn-outline-primary">{{ button_label|default('Add') }}</button>
+    <button class="btn btn-outline-primary">{{ button_label|default('Sauvegarder') }}</button>
 {{ form_end(form) }}
