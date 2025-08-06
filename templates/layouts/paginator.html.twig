@@ -1,4 +1,4 @@
-{% if pageCount %}
+{% if pageCount > 1 %}
     <nav aria-label="Page navigation example">
     <ul class="pagination">
     {% if previous is defined %}
@@ -7,6 +7,7 @@
             <span aria-hidden="true">&laquo;</span>
         </a>
         </li>
+        {% endif %}
         {% for page in pagesInRange %}
             {% if page != current %}
                     <li class="page-item">

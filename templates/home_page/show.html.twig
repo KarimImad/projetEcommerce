@@ -34,7 +34,7 @@
                     </a>
                     <p class="card-text">{{ product.Description |slice(0,60) }}...</p>
                     <h3>{{product.Price}}€</h3>
-                    <a href="" class="btn btn-primary">Ajouter au panier</a>
+                    <a href="{{path('app_cart_new',{'id':product.id})}}" class="btn btn-primary">Ajouter au panier</a>
                 </div>
             </div>
         </div>
