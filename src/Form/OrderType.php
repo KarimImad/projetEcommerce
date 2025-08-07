@@ -43,7 +43,14 @@ class OrderType extends AbstractType
                 'attr'=>[
                     'class'=>'form form-control'
                 ]
+
+            ])
+            
+            ->add('payOnDelivery', null, [
+                'label' => 'Payez à la livraison'
+                
             ]);
+            
     }
 
     public function configureOptions(OptionsResolver $resolver): void

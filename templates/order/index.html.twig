@@ -21,6 +21,10 @@
              <h3>
                 <span id="shippingCost"></span>€
             </h3>
+            <span>Montant total à payer</span>
+            <h3>
+            <span class="total-price"></span>€
+            </h3>
         
         </div>
     </div>
@@ -35,44 +39,42 @@
 
         const url = `/city/${cityValue}/shipping/cost`;
 
-        $.ajax({
-            url:url,
-            type:'GET',
-            success:function(response){
-                const newResponse = JSON.parse(response)
-                if (parseInt(newResponse.status) == 200){
-                    console.log(newResponse.status)
-                    $("#shippingCost").text(newResponse.content)
-                }
+            function ajaxRequest(url){
 
-            },
-            error:function(xhr,status,error){
+        
+
+                    $.ajax({
+                        url:url,
+                        type:'GET',
+                        success:function(response){
+                            const newResponse = JSON.parse(response)
+                            if (parseInt(newResponse.status) == 200){
+                                console.log(newResponse.status)
+                                $("#shippingCost").text(newResponse.content)
+
+                                const cardPrice = parseInt($('#card-price').text());
+                                const shippingCost = parseInt($('#shippingCost').text());
+                                $('.total-price').text(cardPrice+shippingCost);
+                                console.log(cardPrice)
+                            }
+
+                        },
+                        error:function(xhr,status,error){
 
 
+                        }
+                   })
             }
-        })
 
-        citySelector.on("change",function(){
-            const newCityValue=$(this).val();
-            const newUrl=`/city/${newCityValue}/shipping/cost`;
+            ajaxRequest(url)       
 
-            $.ajax({
-                url:newUrl,
-                type:'GET',
-                success:function(response){
-                    const newResponse = JSON.parse(response)
-                    if (parseInt(newResponse.status) == 200){
-                        console.log(newResponse.status)
-                        $("#shippingCost").text(newResponse.content)
-                    }
+            citySelector.on("change",function(){
+                //const newCityValue=$(this).val();
+                const newUrl=`/city/${$(this).val()}/shipping/cost`;
 
-                },
-                error:function(xhr,status,error){
+               ajaxRequest(newUrl)
 
-
-                }
             })
-        })
     })
 
 </script>
