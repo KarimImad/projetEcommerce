@@ -47,7 +47,10 @@ class OrderType extends AbstractType
             ])
             
             ->add('payOnDelivery', null, [
-                'label' => 'Payez à la livraison'
+                'label' => 'Payez à la livraison',
+                'attr'=>[
+                    'class'=>'mx-2'
+                ]
                 
             ]);
             
