@@ -21,32 +21,26 @@ final class OrderController extends AbstractController
                             SessionInterface $session, Request $request, Cart $cart): Response
     {
        
-        $cart = $session->get('cart',[]);
-    
-        $cartWithData=[];
-       
-        foreach ($cart as $id => $quantity) {
-
-            
-            $cartWithData[] = [
-                'product' => $productRepository->find($id),
-                'quantity' => $quantity
-            ];
-        }
-        
-        $total = array_sum(array_map(function ($item){
-        
-            return $item['product']->getPrice() * $item['quantity'];
-
-        }, $cartWithData));
+        $data = $cart->getCart($session);
 
         $order= new Order();
         $form= $this->createForm(OrderType::class, $order);
         $form-> handleRequest($request);
 
+        if($form->isSubmitted() && $form->isValid()) {
+            if($order->isPayOnDelivery()) {
+
+                $order->setTotalPrice(($data['total']));
+                $order->setCreatedAt(new \DatetimeImmutable());
+                $entityManager->persist($order);
+                $entityManager->flush();
+            }
+
+        }
+
         return $this->render('order/index.html.twig', [
             'form'=>$form->createView(),
-            'total'=>$total,
+            'total'=>$data['total'],
         ]);
     }
 
