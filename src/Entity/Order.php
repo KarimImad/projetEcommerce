@@ -40,11 +40,14 @@ class Order
     /**
      * @var Collection<int, OrderProducts>
      */
-    #[ORM\OneToMany(targetEntity: OrderProducts::class, mappedBy: '_order')]
+    #[ORM\OneToMany(targetEntity: OrderProducts::class, mappedBy: '_order', cascade: ["persist","remove"])]
     private Collection $orderProducts;
 
     #[ORM\Column]
     private ?float $totalPrice = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?bool $isCompleted = null;
 
     public function __construct()
     {
@@ -178,6 +181,18 @@ class Order
     public function setTotalPrice(float $totalPrice): static
     {
         $this->totalPrice = $totalPrice;
+
+        return $this;
+    }
+
+    public function isCompleted(): ?bool
+    {
+        return $this->isCompleted;
+    }
+
+    public function setIsCompleted(?bool $isCompleted): static
+    {
+        $this->isCompleted = $isCompleted;
 
         return $this;
     }

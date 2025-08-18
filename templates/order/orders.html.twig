@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Orders{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h1 class="text-center mt-4 mb-4" >Orders</h1>
+        {# {% include 'layouts/flash_message.html.twig' %} #}
+
+        {% for order in orders %}
+            <h2>Commande n° {{ order.id }}</h2>
+            {% if order.isCompleted ==true %}
+                <span class='text-success'>Commande livrée : {{ order.createdAt|date }}</span>
+            {% else %}
+                <span class='text-danger'>Commande non livrée : {{ order.createdAt|date }}</span>
+            {% endif %}
+            <br>
+            <span class='text-primary'>Informations du client</span>
+            <table  class="table table-striped table-dark">
+                <tr>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Phone</th>
+                    <th>Address</th>
+                    <th>City</th>
+                </tr>
+                <tr>
+                    <td>{{order.firstName}}</td>
+                    <td>{{order.lastName}}</td>
+                    <td>{{order.phone}}</td>
+                    <td>{{order.adress}}</td>
+                    <td>{{order.city.name}}</td>  
+                </tr>
+            </table>
+
+            <h5 class='text-primary'>Corps de la commande</h5>
+            <table class="table table-bordered">
+                    <tr>
+                        <th>Nom du produit</th>
+                        <th>Prix du produit</th>
+                        <th>Quantité</th>
+                        <th>Prix total</th>
+                    </tr>
+    
+                {% for product in order.orderProducts %}
+                <tr>
+                    <td>{{ product.product.name}}</td>
+                    <td>{{ product.product.price}}€</td>
+                    <td>{{ product.quantity}}</td>
+                    <td>{{ product.product.price*product.quantity}}€</td>
+                </tr>
+                {% endfor %}
+            </table>
+            <span>Frais de livraisons : {{ order.city.shippingCost}} €</span>
+            <h5 class='mb-5'>Total à payer : {{order.totalPrice}} €</h5>
+            {% if order.isCompleted != true %}
+                <a href="{{path('app_orders_is-completed-update',{'id':order.id})}}" class='btn btn-outline-primary col-2 m-1g-1'>Marquer comme livrée</a>
+            {% endif %}
+            <a onclick="return confirm ('Voulez-vous vraiment supprimer cette commande ?')" href=" {{ path('app_orders_remove',{'id':order.id})}}" class='btn btn-outline-danger col-2 m-lg-1'>Supprimer la commande</a>
+            <hr>
+        {% endfor %}
+        {{knp_pagination_render(orders,'layouts/paginator.html.twig')}}
+    </div>
+
+{% endblock %}
