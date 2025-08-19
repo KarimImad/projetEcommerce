@@ -1,0 +1,144 @@
+{
+  "id": "evt_3RxqBmPkBS6NGeuz1Owcc1Sk",
+  "object": "event",
+  "api_version": "2025-07-30.basil",
+  "created": 1755612427,
+  "data": {
+    "object": {
+      "id": "ch_3RxqBmPkBS6NGeuz1qWcU4pV",
+      "object": "charge",
+      "amount": 10500,
+      "amount_captured": 10500,
+      "amount_refunded": 0,
+      "application": null,
+      "application_fee": null,
+      "application_fee_amount": null,
+      "balance_transaction": "txn_3RxqBmPkBS6NGeuz1A1YmtD5",
+      "billing_details": {
+        "address": {
+          "city": "Bordeaux",
+          "country": "FR",
+          "line1": "12 Rue Vital Carles",
+          "line2": null,
+          "postal_code": "33000",
+          "state": null
+        },
+        "email": "karimimadbz@gmail.com",
+        "name": "Karim Imad",
+        "phone": null,
+        "tax_id": null
+      },
+      "calculated_statement_descriptor": "Stripe",
+      "captured": true,
+      "created": 1755612423,
+      "currency": "eur",
+      "customer": null,
+      "description": null,
+      "destination": null,
+      "dispute": null,
+      "disputed": false,
+      "failure_balance_transaction": null,
+      "failure_code": null,
+      "failure_message": null,
+      "fraud_details": {},
+      "livemode": false,
+      "metadata": {},
+      "on_behalf_of": null,
+      "order": null,
+      "outcome": {
+        "advice_code": null,
+        "network_advice_code": null,
+        "network_decline_code": null,
+        "network_status": "approved_by_network",
+        "reason": null,
+        "risk_level": "normal",
+        "risk_score": 40,
+        "seller_message": "Payment complete.",
+        "type": "authorized"
+      },
+      "paid": true,
+      "payment_intent": "pi_3RxqBmPkBS6NGeuz1xD5BQOe",
+      "payment_method": "pm_1RxqBmPkBS6NGeuzkp4cANAu",
+      "payment_method_details": {
+        "card": {
+          "amount_authorized": 10500,
+          "authorization_code": "477888",
+          "brand": "visa",
+          "checks": {
+            "address_line1_check": "pass",
+            "address_postal_code_check": "pass",
+            "cvc_check": "pass"
+          },
+          "country": "US",
+          "exp_month": 1,
+          "exp_year": 2033,
+          "extended_authorization": {
+            "status": "disabled"
+          },
+          "fingerprint": "d48z8wLW2XNTIbw9",
+          "funding": "credit",
+          "incremental_authorization": {
+            "status": "unavailable"
+          },
+          "installments": null,
+          "last4": "4242",
+          "mandate": null,
+          "multicapture": {
+            "status": "unavailable"
+          },
+          "network": "visa",
+          "network_token": {
+            "used": false
+          },
+          "network_transaction_id": "100525612256119",
+          "overcapture": {
+            "maximum_amount_capturable": 10500,
+            "status": "unavailable"
+          },
+          "regulated_status": "unregulated",
+          "three_d_secure": null,
+          "wallet": null
+        },
+        "type": "card"
+      },
+      "radar_options": {},
+      "receipt_email": null,
+      "receipt_number": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUnhsQlNQa0JTNk5HZXV6KIuKksUGMgayTvTTwT06LBYJRvruPbLg9gvPQFh5dLoU5-iTkRA2hvoJESGmStqEPNVtm_ysxysKiElo",
+      "refunded": false,
+      "review": null,
+      "shipping": {
+        "address": {
+          "city": "Bordeaux",
+          "country": "FR",
+          "line1": "12 Rue Vital Carles",
+          "line2": null,
+          "postal_code": "33000",
+          "state": null
+        },
+        "carrier": null,
+        "name": "Karim Imad",
+        "phone": null,
+        "tracking_number": null
+      },
+      "source": null,
+      "source_transfer": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "succeeded",
+      "transfer_data": null,
+      "transfer_group": null
+    },
+    "previous_attributes": {
+      "balance_transaction": null,
+      "receipt_url": "https://pay.stripe.com/receipts/payment/CAcaFwoVYWNjdF8xUnhsQlNQa0JTNk5HZXV6KIuKksUGMgZk6lUZBSM6LBb9AGUlczEVuJnT81elyxTC_qWwaYumtmssn3uFMWZkW_Fo9rcXVw30oX31"
+    }
+  },
+  "livemode": false,
+  "pending_webhooks": 2,
+  "request": {
+    "id": null,
+    "idempotency_key": null
+  },
+  "type": "charge.updated"
+}

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use Stripe\Stripe;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,12 +29,15 @@ final class StripeController extends AbstractController
      #[Route('/stripe/notify', name: 'app_stripe_notify')]
     public function stripeNotify(Request $request):Response
     {
+        file_put_contents("log.txt", "");
+        
         Stripe::setApiKey($_SERVER['STRIPE_WEBHOOK_SECRET']);
         
         // Définir la clé de webhook de Stripe
         $endpoint_secret = 'whsec_79c3bf63a1b1b1de154dfb3a1e2c5985bf7c74fcb2cfbe199907ae620cf816df';
         // Récupérer le contenu de la requête
         $payload = $request->getContent();
+        file_put_contents("log.txt", $payload, FILE_APPEND);
         // Récupérer l'en-tête de signature de la requête
         $sigHeader = $request->headers->get('Stripe-Signature');
         // Initialiser l'événement à null
