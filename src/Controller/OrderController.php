@@ -7,18 +7,26 @@ use App\Entity\Order;
 use App\Service\Cart;
 use App\Form\OrderType;
 use App\Entity\OrderProducts;
+use App\Service\StripePayment;
+use Symfony\Component\Mime\Email;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
-final class OrderController extends AbstractController
+// final class OrderController extends AbstractController
+// {
+class OrderController extends AbstractController
 {
+    public function __construct(private MailerInterface $mailer){
+    }
+    
     #[Route('/order', name: 'app_order')]
     public function index(EntityManagerInterface $entityManager, ProductRepository $productRepository, 
                             SessionInterface $session, Request $request, Cart $cart): Response
@@ -49,11 +57,30 @@ final class OrderController extends AbstractController
                     }
                 }
 
-                $session->set('cart', []);
+                $session->set('cart', []); //mise à jour du contenu du panier
 
-                return $this->redirectToRoute('order_message');
+                $html = $this->renderView('mail/orderConfirm.html.twig',[
+                    'order'=>$order //on récupère le $order apres le flush donc on a toutes les infos
+                ]);
+
+                $email = (new Email()) //On importe la classe depuis Symfony\Component\Mime\Email;
+                        ->from('mortalkombat@gmailcom') //Adresse de l'expéditeur donc notre boutique ou vous mêmes
+                        ->to($order->getEmail())//Adresse du receveur
+                        ->subject('Confirmation de réception de commande') //Intitulé du mail
+                        ->html($html);
+                        $this->mailer->send($email);
+
+
+                return $this->redirectToRoute('order_message'); //redirection vers la page du panier
                 
             }
+
+            $paymentStripe = new StripePayment();//on importe notre service avec sa classe
+            $shippingCost = $order->getCity()->getShippingCost();
+            $paymentStripe->startPayment($data, $shippingCost);//on importe le panier donc $data
+            $stripeRedirectUrl = $paymentStripe->getStripeRedirectUrl();
+
+            return $this->redirect($stripeRedirectUrl);
 
         }
 
