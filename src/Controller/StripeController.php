@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\OrderRepository;
+use Doctrine\ORM\EntityManager;
 use Stripe\Stripe;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -27,27 +29,30 @@ final class StripeController extends AbstractController
     }
 
      #[Route('/stripe/notify', name: 'app_stripe_notify')]
-    public function stripeNotify(Request $request):Response
+    public function stripeNotify(Request $request, OrderRepository $orderRepository, EntityManager $entityManager):Response
     {
-        file_put_contents("log.txt", "");
+        file_put_contents("log.txt", "test");
         
-        Stripe::setApiKey($_SERVER['STRIPE_WEBHOOK_SECRET']);
+        Stripe::setApiKey($_SERVER['STRIPE_SECRET_KEY']);
         
         // Définir la clé de webhook de Stripe
-        $endpoint_secret = 'whsec_79c3bf63a1b1b1de154dfb3a1e2c5985bf7c74fcb2cfbe199907ae620cf816df';
+        $endpoint_secret = $_SERVER['STRIPE_WEBHOOK_SECRET'];
         // Récupérer le contenu de la requête
         $payload = $request->getContent();
-        file_put_contents("log.txt", $payload, FILE_APPEND);
+        
         // Récupérer l'en-tête de signature de la requête
         $sigHeader = $request->headers->get('Stripe-Signature');
         // Initialiser l'événement à null
         $event = null;
 
         try {
+            file_put_contents("log.txt","try", FILE_APPEND);
+            
             // Construire l'événement à partir de la requête et de la signature
             $event = \Stripe\Webhook::constructEvent(
                 $payload, $sigHeader, $endpoint_secret
             );
+            file_put_contents("log.txt","ok", FILE_APPEND);
         } catch (\UnexpectedValueException $e) {
             // Retourner une erreur 400 si le payload est invalide
             return new Response('Invalid payload', 400);
@@ -63,8 +68,17 @@ final class StripeController extends AbstractController
                 $paymentIntent = $event->data->object;
 
               // Enregistrer les détails du paiement dans un fichier
-                $fileName = 'stripe-detail-'.uniqid().'.txt';
-                file_put_contents($fileName, $paymentIntent);
+                // $fileName = 'stripe-detail-'.uniqid().'.txt';
+                $orderId = $paymentIntent->metadata->orderid;
+                $order = $orderRepository->find($orderId);
+
+                $cartPrice = $order->getTotalPrice();
+                $stripeTotalAmount = $paymentIntent->amount/100;
+                if($cartPrice==$stripeTotalAmount){
+                $order->setIsPaymentCompleted(1);
+                $entityManager->flush();
+                }
+                file_put_contents("order.txt", $orderId);
                 break;
             case 'payment_method.attached':  //évenement de méthode de paiement attachée
                 // Récupérer l'objet payment_method

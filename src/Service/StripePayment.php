@@ -15,7 +15,7 @@ class StripePayment
         Stripe::setApiVersion('2025-07-30.basil'); //on gère la version de Stripe
     }
 
-    public function startPayment($cart,$shippingCost){
+    public function startPayment($cart,$shippingCost, $orderId){
         $cartProducts = $cart['cart']; 
         // Initialisation d'un tableau vide pour stocker les produits formatés
         $products = [
@@ -63,6 +63,7 @@ class StripePayment
             ],
             'payment_intent_data' => [
                 'metadata' => [
+                'orderid' =>$orderId // id de la commande
                     
                 ]
             ] 
