@@ -18,6 +18,8 @@ final class HomePageController extends AbstractController
     #[Route('/', name: 'app_home_page', methods:['GET'])]
     public function index(ProductRepository $productRepo, CategoryRepository $categoryRepository, Request $request, PaginatorInterface $paginator): Response
     {   
+        // $search= $productRepo->SearchEngine('mma');
+        // dd($search);
 
         $data = $productRepo->findby([],['id'=>"DESC"]);
         $products = $paginator->paginate(

@@ -128,28 +128,41 @@ class OrderController extends AbstractController
         return $this->render('order/order_message.html.twig');
     }
 
-    #[Route('/editor/order', name: 'app_orders_show')] 
-    public function getAllOrder(OrderRepository $orderRepo,PaginatorInterface $paginator, Request $request): Response
+    #[Route('/editor/order/{type}', name: 'app_orders_show')] 
+    public function getAllOrder($type,OrderRepository $orderRepo,PaginatorInterface $paginator, Request $request): Response
     {
-        $orders= $orderRepo->findAll();
-        $orderPagination = $paginator->paginate(
-            $orders,
+        // $orders= $orderRepo->findAll();
+
+        if($type == 'is-completed'){
+            $data = $orderRepo->findBy(['isCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'pay-on-stripe-not-delivered'){
+            $data = $orderRepo->findBy(['isCompleted'=>null,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'pay-on-stripe-is-delivered'){
+            $data = $orderRepo->findBy(['isCompleted'=>1,'payOnDelivery'=>0,'isPaymentCompleted'=>1],['id'=>'DESC']);
+        }else if($type == 'no_delivery'){
+            $data = $orderRepo->findBy(['isCompleted'=>null,'payOnDelivery'=>0,'isPaymentCompleted'=>0],['id'=>'DESC']);
+        }else if($type == 'all'){
+            $data = $orderRepo->findAll();
+        }
+
+        $orders= $paginator->paginate(
+            $data,
             $request->query->getInt('page',1),
             2
         );
 
         return $this->render('order/orders.html.twig', [
-            'orders'=>$orderPagination,
+            'orders'=>$orders,
         ]);
     }
 
      #[Route('/editor/order/{id}/remove', name: 'app_orders_remove')]
-    public function removeOrder(Order $order, EntityManagerInterface $entityManager):Response 
+    public function removeOrder(Order $order,Request $request, EntityManagerInterface $entityManager):Response 
     {
         $entityManager->remove($order);
         $entityManager->flush();
         $this->addFlash('danger', 'Commande supprimée');
-        return $this->redirectToRoute('app_orders_show',['type']);
+        return $this->redirect($request->headers->get('referer'));
     }
 
 }

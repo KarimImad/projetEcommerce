@@ -3,18 +3,20 @@
 namespace App\Controller;
 
 use App\Repository\OrderRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Stripe;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 final class StripeController extends AbstractController
 {
     #[Route('/pay/success', name: 'app_stripe_success')]
-    public function success(): Response
+    public function success(SessionInterface $session): Response
     {
+        $session->set('cart',[]);
         return $this->render('stripe/success.html.twig', [
             'controller_name' => 'StripeController',
         ]);
@@ -29,9 +31,9 @@ final class StripeController extends AbstractController
     }
 
      #[Route('/stripe/notify', name: 'app_stripe_notify')]
-    public function stripeNotify(Request $request, OrderRepository $orderRepository, EntityManager $entityManager):Response
+    public function stripeNotify(Request $request, OrderRepository $orderRepository, EntityManagerInterface $entityManager):Response
     {
-        file_put_contents("log.txt", "test");
+        // file_put_contents("log.txt", "test");
         
         Stripe::setApiKey($_SERVER['STRIPE_SECRET_KEY']);
         
@@ -46,13 +48,13 @@ final class StripeController extends AbstractController
         $event = null;
 
         try {
-            file_put_contents("log.txt","try", FILE_APPEND);
+            // file_put_contents("log.txt","try", FILE_APPEND);
             
             // Construire l'événement à partir de la requête et de la signature
             $event = \Stripe\Webhook::constructEvent(
                 $payload, $sigHeader, $endpoint_secret
             );
-            file_put_contents("log.txt","ok", FILE_APPEND);
+            // file_put_contents("log.txt","ok", FILE_APPEND);
         } catch (\UnexpectedValueException $e) {
             // Retourner une erreur 400 si le payload est invalide
             return new Response('Invalid payload', 400);
@@ -71,14 +73,13 @@ final class StripeController extends AbstractController
                 // $fileName = 'stripe-detail-'.uniqid().'.txt';
                 $orderId = $paymentIntent->metadata->orderid;
                 $order = $orderRepository->find($orderId);
-
                 $cartPrice = $order->getTotalPrice();
                 $stripeTotalAmount = $paymentIntent->amount/100;
                 if($cartPrice==$stripeTotalAmount){
                 $order->setIsPaymentCompleted(1);
                 $entityManager->flush();
                 }
-                file_put_contents("order.txt", $orderId);
+                // file_put_contents("order.txt", $orderId);
                 break;
             case 'payment_method.attached':  //évenement de méthode de paiement attachée
                 // Récupérer l'objet payment_method

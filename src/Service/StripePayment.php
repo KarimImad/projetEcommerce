@@ -59,7 +59,7 @@ class StripePayment
             'success_url' => 'http://localhost:8000/pay/success', //si paiement réussi
             'billing_address_collection' => 'required', //si on autorise les factures
             'shipping_address_collection' => [ //pays ou on souhaite autorise le paiement
-                'allowed_countries' => ['FR','EG'],
+                'allowed_countries' => ['FR'],
             ],
             'payment_intent_data' => [
                 'metadata' => [
