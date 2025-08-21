@@ -10,14 +10,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class SearchEngineController extends AbstractController
 {
-    #[Route('/search/engine', name: 'app_search_engine', methods:['POST'])]
+    #[Route('/search/engine', name: 'app_search_engine')]
     public function index(Request $request, ProductRepository $productRepository): Response
     {   //vérifie si la requête est de type GET
-        if ($request->isMethod('GET')){
-            //Récupère les données de la requête
-            $data = $request->request->all();
-            //Récupère le mot-clé de recherche
-            $word = $data['word'];
+        if ($request->isMethod('POST')){
+            $word= $request->get("word");
+    
+            
 
             //Appelle la méthode searchengine du repository
             $results = $productRepository->searchEngine($word);
