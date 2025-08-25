@@ -15,13 +15,9 @@ final class SearchEngineController extends AbstractController
     {   //vérifie si la requête est de type GET
         if ($request->isMethod('POST')){
             $word= $request->get("word");
-    
-            
-
             //Appelle la méthode searchengine du repository
             $results = $productRepository->searchEngine($word);
         }
-
         //Rendu de la vue search_engine/twig 
         return $this->render('search_engine/index.html.twig', [
             'products' => $results,

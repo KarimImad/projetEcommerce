@@ -69,17 +69,33 @@ final class StripeController extends AbstractController
                 // Récupérer l'objet payment_intent
                 $paymentIntent = $event->data->object;
 
+
               // Enregistrer les détails du paiement dans un fichier
                 // $fileName = 'stripe-detail-'.uniqid().'.txt';
                 $orderId = $paymentIntent->metadata->orderid;
                 $order = $orderRepository->find($orderId);
                 $cartPrice = $order->getTotalPrice();
                 $stripeTotalAmount = $paymentIntent->amount/100;
+
                 if($cartPrice==$stripeTotalAmount){
-                $order->setIsPaymentCompleted(1);
-                $entityManager->flush();
+
+                    $order->setIsPaymentCompleted(1);
+                    
+                    foreach ($order->getOrderProducts() as $orderProduct){
+                        $quantity = $orderProduct->getQuantity();
+                        $product = $orderProduct->getProduct();
+                        $stock = $product->getStock();
+
+                        $updatedstock = $stock-$quantity;
+                        $product->setStock($updatedstock);
+
+                    }
+
+                    $entityManager->flush();
                 }
-                // file_put_contents("order.txt", $orderId);
+
+                    
+                // file_put_contents("order.txt", $order->getOrderProducts()->first()->getProduct(),FILE_APPEND);
                 break;
             case 'payment_method.attached':  //évenement de méthode de paiement attachée
                 // Récupérer l'objet payment_method
