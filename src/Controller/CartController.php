@@ -2,13 +2,14 @@
 
 namespace App\Controller;
 
-
+use App\Entity\Product;
 use App\Service\Cart;
 use App\Repository\ProductRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 final class CartController extends AbstractController
 {
@@ -30,17 +31,27 @@ final class CartController extends AbstractController
 
     #[Route('/cart/add/{id}/', name: 'app_cart_new', methods:['GET'])]
     //Définit une route pour ajouter un produit au panier
-    public function addProductToCart(int $id, SessionInterface $session): Response //int veut dire qu'on attend obligatoirement que l'id soit un entier
+    public function addProductToCart(int $id, SessionInterface $session, Request $request, Product $product): Response //int veut dire qu'on attend obligatoirement que l'id soit un entier
     //Méthode pour ajouter un produit au panier, prend l'ID du produit et la session en paramètres
     {
-        $cart= $session->get('cart',[]);
+        $cart = $session->get('cart',[]);
+        $stock = $product->getStock();
         // Récupère le panier actuel de la session, ou un tableau vide si il n'existe pas
         if (!empty($cart[$id])){
             $cart[$id]++;
         }else{
             $cart[$id]=1;
         }
-        // Si le produit est déjà dans le panier, incrémente sa quantité sinon l'ajoute avec une quantité de 1
+          // Si le produit est déjà dans le panier, incrémente sa quantité sinon l'ajoute avec une quantité de 1
+        
+        if ($cart[$id] > $stock){
+            $this->addFlash('danger', 'Le stock est insuffisant pour le moment, maximum ' .$stock. ' produits');
+        
+            return $this->redirect($request->headers->get('referer'));
+        } 
+
+
+      
         $session->set('cart',$cart);
         //Met à jour le panier dans la session 
         return $this->redirectToRoute('app_cart');

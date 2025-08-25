@@ -77,22 +77,35 @@ final class StripeController extends AbstractController
                 $cartPrice = $order->getTotalPrice();
                 $stripeTotalAmount = $paymentIntent->amount/100;
 
-                if($cartPrice==$stripeTotalAmount){
+                // Vérifie que le prix du panier correspond bien au montant payé via Stripe
+                if($cartPrice == $stripeTotalAmount){
 
+                    // Marque la commande comme payée
                     $order->setIsPaymentCompleted(1);
-                    
+                                    
+                    // Parcourt tous les produits de la commande
                     foreach ($order->getOrderProducts() as $orderProduct){
+                        
+                        // Récupère la quantité commandée pour ce produit
                         $quantity = $orderProduct->getQuantity();
+                        
+                        // Récupère l'objet produit associé à cette ligne de commande
                         $product = $orderProduct->getProduct();
+                        
+                        // Récupère le stock actuel du produit
                         $stock = $product->getStock();
 
-                        $updatedstock = $stock-$quantity;
+                        // Calcule le stock mis à jour en retirant la quantité commandée
+                        $updatedstock = $stock - $quantity;
+                        
+                        // Met à jour le stock du produit
                         $product->setStock($updatedstock);
-
                     }
 
+                    // Sauvegarde toutes les modifications en base de données
                     $entityManager->flush();
                 }
+
 
                     
                 // file_put_contents("order.txt", $order->getOrderProducts()->first()->getProduct(),FILE_APPEND);

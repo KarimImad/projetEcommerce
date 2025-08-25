@@ -6,22 +6,22 @@
 <div class="container">
     <div class="row">
         {% for product in products %}
-        <div class="col-md-3 g-4 ">
-            <div class="card" style="width: 18rem;">
-                <img src="{{asset('uploads/images/'~ product.image)}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <a class="titleProductionLink" href="{{path('app_home_product_show',{'id':product.id})}}">
-                    <h5 class="card-title"> {{ product.name }} </h5>
-                    </a>
-                    <p class="card-text text-truncate">{{ product.Description |slice(0,60) }}...</p>
-                    <h3>{{product.Price}}€</h3>
-                    <a href="{{path('app_cart_new',{'id':product.id})}}" class="btn btn-primary">Ajouter au panier</a>
+            <div class="col-md-3 g-4 ">
+                <div class="card" style="width: 18rem;">
+                    <img src="{{asset('uploads/images/'~ product.image)}}" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <a class="titleProductionLink" href="{{path('app_home_product_show',{'id':product.id})}}">
+                        <h5 class="card-title"> {{ product.name }} </h5>
+                        </a>
+                        <p class="card-text text-truncate">{{ product.Description |slice(0,60) }}...</p>
+                        <h3>{{product.Price}}€</h3>
+                        <a href="{{path('app_cart_new',{'id':product.id})}}" class="btn btn-primary">Ajouter au panier</a>
+                    </div>
                 </div>
             </div>
-        </div>
    
 
-            {% endfor %}
+        {% endfor %}
     </div>
     <br>
     {{knp_pagination_render(products,'layouts/paginator.html.twig')}}
